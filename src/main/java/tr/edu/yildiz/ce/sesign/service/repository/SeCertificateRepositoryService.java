@@ -17,6 +17,10 @@ import java.security.UnrecoverableKeyException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.transaction.Transactional;
 
 import org.bouncycastle.asn1.x500.X500Name;
 import org.bouncycastle.asn1.x509.BasicConstraints;
@@ -38,7 +42,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
+import tr.edu.yildiz.ce.se.base.context.TenantContext;
 import tr.edu.yildiz.ce.sesign.domain.constants.CertificateConstants;
+import tr.edu.yildiz.ce.sesign.domain.dto.SeCertificateDto;
 import tr.edu.yildiz.ce.sesign.domain.dto.TenantUser;
 import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificate;
 import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificateStatus;
@@ -145,5 +151,12 @@ public class SeCertificateRepositoryService {
                 var keyStoreOs = new ByteArrayOutputStream();
                 sslKeyStore.store(keyStoreOs, password.toCharArray());
                 return keyStoreOs.toByteArray();
+        }
+
+        @Transactional
+        public List<SeCertificateDto> findTenantsCertificates() {
+                var tenantId = TenantContext.getCurrentTenant().getTenantId();
+                return seCertificateRepository.findByTenantId(tenantId).stream()
+                                .map(c -> new SeCertificateDto(c.getName(), c.getId())).collect(Collectors.toList());
         }
 }
