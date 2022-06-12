@@ -19,7 +19,7 @@ public class CertificateController {
         this.certificateControllerService = certificateControllerService;
     }
 
-    @PostMapping(value = { "/", "" })
+    @PostMapping(value = "/new")
     public ResponseEntity<CertificateInsertionControllerResponse> generateCertificate(
             @RequestBody CertificateInsertionControllerRequest request) {
         return ResponseEntity.ok().body(certificateControllerService.createSignedCertificate(request));
