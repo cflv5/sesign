@@ -20,6 +20,7 @@ import tr.edu.yildiz.ce.se.base.domain.ResponseHeader;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
 import tr.edu.yildiz.ce.sesign.domain.request.CertificateInsertionControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.CertificateInsertionControllerResponse;
+import tr.edu.yildiz.ce.sesign.domain.response.FindTenantsCertificateControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.external.UserExternalService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeCertificateRepositoryService;
 import tr.edu.yildiz.ce.sesign.util.CertificateUtil;
@@ -55,6 +56,11 @@ public class CertificateControllerService {
             LOGGER.error("Error occured while creating certificate", e);
             throw new SeBaseException("Could not create certificate", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public FindTenantsCertificateControllerResponse findTenantsCerts() {
+        return new FindTenantsCertificateControllerResponse(ResponseHeader.success(),
+                seCertificateRepositoryService.findTenantsCertificates());
     }
 
 }
