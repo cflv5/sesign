@@ -1,0 +1,19 @@
+{
+  "properties": [
+    {
+      "name": "crypto.policy",
+      "type": "java.lang.String",
+      "description": "A description for 'crypto.policy'"
+    },
+    {
+      "name": "se.key-store.password",
+      "type": "java.lang.String",
+      "description": "A description for 'se.key-store.password'"
+    },
+    {
+      "name": "se.base.rest-client.access-token",
+      "type": "java.lang.String",
+      "description": "A description for 'se.base.rest-client.access-token'"
+    }
+  ]
+}
