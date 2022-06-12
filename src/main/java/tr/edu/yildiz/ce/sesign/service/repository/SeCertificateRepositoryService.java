@@ -44,10 +44,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import tr.edu.yildiz.ce.se.base.context.TenantContext;
+import tr.edu.yildiz.ce.se.base.domain.common.TenantUser;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
 import tr.edu.yildiz.ce.sesign.domain.constants.CertificateConstants;
 import tr.edu.yildiz.ce.sesign.domain.dto.SeCertificateDto;
-import tr.edu.yildiz.ce.sesign.domain.dto.TenantUser;
 import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificate;
 import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificateStatus;
 import tr.edu.yildiz.ce.sesign.domain.request.CertificateInsertionControllerRequest;
