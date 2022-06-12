@@ -42,6 +42,7 @@ import tr.edu.yildiz.ce.sesign.domain.constants.CertificateConstants;
 import tr.edu.yildiz.ce.sesign.domain.dto.TenantUser;
 import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificate;
 import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificateStatus;
+import tr.edu.yildiz.ce.sesign.domain.request.CertificateInsertionControllerRequest;
 import tr.edu.yildiz.ce.sesign.repository.SeCertificateRepository;
 import tr.edu.yildiz.ce.sesign.util.CertificateUtil;
 
@@ -120,14 +121,16 @@ public class SeCertificateRepositoryService {
                 return issuedCert;
         }
 
-        public SeCertificate saveSeCertificate(PrivateKey pk, X509Certificate cert, String password, String tenantId)
+        public SeCertificate saveSeCertificate(PrivateKey pk, X509Certificate cert,
+                        CertificateInsertionControllerRequest request, String tenantId)
                         throws NoSuchAlgorithmException, CertificateException, KeyStoreException,
                         NoSuchProviderException, IOException {
                 var seCert = new SeCertificate();
 
                 seCert.setTenantId(tenantId);
                 seCert.setStatus(SeCertificateStatus.ACTIVE);
-                seCert.setKeyStore(Base64.encode(createKeyStoreWith(pk, cert, password)));
+                seCert.setName(request.getName());
+                seCert.setKeyStore(Base64.encode(createKeyStoreWith(pk, cert, request.getPassword())));
 
                 return seCertificateRepository.save(seCert);
         }

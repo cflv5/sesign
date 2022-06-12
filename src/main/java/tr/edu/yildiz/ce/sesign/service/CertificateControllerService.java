@@ -46,7 +46,7 @@ public class CertificateControllerService {
             var signedCertificate = seCertificateRepositoryService.createAndSignCertificate(keyPair, tenant);
             var seCertificate = seCertificateRepositoryService.saveSeCertificate(keyPair.getPrivate(),
                     signedCertificate,
-                    request.getPassword(), tenantId);
+                    request, tenantId);
 
             return new CertificateInsertionControllerResponse(ResponseHeader.success(), seCertificate.getId());
         } catch (UnrecoverableKeyException | InvalidKeyException | OperatorCreationException
