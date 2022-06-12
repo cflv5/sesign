@@ -9,7 +9,10 @@ import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 
+import javax.transaction.Transactional;
+
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import tr.edu.yildiz.ce.se.base.context.TenantContext;
 import tr.edu.yildiz.ce.se.base.domain.ResponseHeader;
+import tr.edu.yildiz.ce.se.base.domain.io.NamedResource;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
 import tr.edu.yildiz.ce.sesign.domain.request.CertificateInsertionControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.CertificateInsertionControllerResponse;
@@ -61,6 +65,12 @@ public class CertificateControllerService {
     public FindTenantsCertificateControllerResponse findTenantsCerts() {
         return new FindTenantsCertificateControllerResponse(ResponseHeader.success(),
                 seCertificateRepositoryService.findTenantsCertificates());
+    }
+
+    @Transactional
+    public NamedResource fetchCertificate(String id) {
+        var seCert = seCertificateRepositoryService.findCertificateWithId(id);
+        return new NamedResource(Base64.decode(seCert.getCert()), seCert.getName() + ".crt");
     }
 
 }

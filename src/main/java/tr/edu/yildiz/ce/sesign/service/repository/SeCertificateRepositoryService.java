@@ -40,9 +40,11 @@ import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
 import org.bouncycastle.util.encoders.Base64;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import tr.edu.yildiz.ce.se.base.context.TenantContext;
+import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
 import tr.edu.yildiz.ce.sesign.domain.constants.CertificateConstants;
 import tr.edu.yildiz.ce.sesign.domain.dto.SeCertificateDto;
 import tr.edu.yildiz.ce.sesign.domain.dto.TenantUser;
@@ -159,5 +161,10 @@ public class SeCertificateRepositoryService {
                 var tenantId = TenantContext.getCurrentTenant().getTenantId();
                 return seCertificateRepository.findByTenantId(tenantId).stream()
                                 .map(c -> new SeCertificateDto(c.getName(), c.getId())).collect(Collectors.toList());
+        }
+
+        public SeCertificate findCertificateWithId(String id) {
+                return seCertificateRepository.findById(id)
+                                .orElseThrow(() -> new SeBaseException("Could not found certificate", HttpStatus.OK));
         }
 }
