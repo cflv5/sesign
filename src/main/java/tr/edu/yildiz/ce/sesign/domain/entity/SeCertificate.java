@@ -21,6 +21,10 @@ public class SeCertificate implements Serializable {
 
     @Lob
     @Basic(fetch = FetchType.LAZY)
+    private byte[] cert;
+
+    @Lob
+    @Basic(fetch = FetchType.LAZY)
     private byte[] keyStore;
 
     @Column
@@ -38,6 +42,14 @@ public class SeCertificate implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public byte[] getCert() {
+        return cert;
+    }
+
+    public void setCert(byte[] cert) {
+        this.cert = cert;
     }
 
     public byte[] getKeyStore() {

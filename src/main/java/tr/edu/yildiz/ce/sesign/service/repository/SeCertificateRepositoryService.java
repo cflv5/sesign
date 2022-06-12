@@ -134,6 +134,7 @@ public class SeCertificateRepositoryService {
                 var seCert = new SeCertificate();
 
                 seCert.setTenantId(tenantId);
+                seCert.setCert(Base64.encode(cert.getEncoded()));
                 seCert.setStatus(SeCertificateStatus.ACTIVE);
                 seCert.setName(request.getName());
                 seCert.setKeyStore(Base64.encode(createKeyStoreWith(pk, cert, request.getPassword())));
