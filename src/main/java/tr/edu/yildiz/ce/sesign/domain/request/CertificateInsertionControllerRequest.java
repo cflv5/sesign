@@ -7,6 +7,8 @@ import javax.validation.constraints.NotBlank;
 public class CertificateInsertionControllerRequest implements Serializable {
     @NotBlank
     private String password;
+    @NotBlank
+    private String name;
 
     public CertificateInsertionControllerRequest() {
         super();
@@ -18,6 +20,14 @@ public class CertificateInsertionControllerRequest implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
 }

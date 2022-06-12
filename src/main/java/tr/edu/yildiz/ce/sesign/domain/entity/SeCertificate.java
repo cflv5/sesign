@@ -27,6 +27,9 @@ public class SeCertificate implements Serializable {
     private String tenantId;
 
     @Column
+    private String name;
+
+    @Column
     private SeCertificateStatus status;
 
     public String getId() {
@@ -51,6 +54,14 @@ public class SeCertificate implements Serializable {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public SeCertificateStatus getStatus() {
