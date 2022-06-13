@@ -10,10 +10,15 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.bouncycastle.util.encoders.Base64;
+
 import tr.edu.yildiz.ce.sesign.domain.constants.CertificateConstants;
+import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificate;
 
 public final class CertificateUtil {
     private CertificateUtil() {
@@ -43,5 +48,10 @@ public final class CertificateUtil {
         InputStream fis = new ByteArrayInputStream(buff);
         ks.load(fis, password.toCharArray());
         return ks;
+    }
+
+    public static X509Certificate loadCertificate(SeCertificate cert) throws CertificateException {
+        var bis = new ByteArrayInputStream(Base64.decode(cert.getCert()));
+        return (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(bis);
     }
 }

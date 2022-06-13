@@ -1,5 +1,13 @@
 package tr.edu.yildiz.ce.sesign.controller;
 
+import java.io.IOException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.validation.Valid;
 
 import org.springframework.core.io.Resource;
@@ -12,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import tr.edu.yildiz.ce.se.base.domain.OnlyHeaderControllerResponse;
 import tr.edu.yildiz.ce.sesign.domain.request.NewSignatureControllerRequest;
+import tr.edu.yildiz.ce.sesign.domain.request.SignatureVerificationControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.NewSignatureControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.SignatureControllerService;
 
@@ -39,6 +49,14 @@ public class SignatureController {
                 .header("Content-Disposition", "attachment; filename=" + signature.getFilename())
                 .contentType(MediaType.TEXT_PLAIN)
                 .body(signature);
+    }
+
+    @PostMapping(value = "/verify")
+    public ResponseEntity<OnlyHeaderControllerResponse> verifySignatureInternal(
+            @RequestBody @Valid SignatureVerificationControllerRequest request)
+            throws InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchPaddingException,
+            IllegalBlockSizeException, BadPaddingException, IOException {
+        return ResponseEntity.ok().body(signatureControlleService.verifySignature(request));
     }
 
 }

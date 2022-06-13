@@ -6,11 +6,13 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.transaction.Transactional;
 
 import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
@@ -19,15 +21,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import tr.edu.yildiz.ce.se.base.context.TenantContext;
+import tr.edu.yildiz.ce.se.base.domain.OnlyHeaderControllerResponse;
 import tr.edu.yildiz.ce.se.base.domain.ResponseHeader;
 import tr.edu.yildiz.ce.se.base.domain.io.NamedResource;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
 import tr.edu.yildiz.ce.sesign.domain.dto.SeSignatureDto;
 import tr.edu.yildiz.ce.sesign.domain.request.NewSignatureControllerRequest;
+import tr.edu.yildiz.ce.sesign.domain.request.SignatureVerificationControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.NewSignatureControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.external.FileExternalService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeCertificateRepositoryService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeSignatureRepositoryService;
+import tr.edu.yildiz.ce.sesign.util.CertificateUtil;
 
 @Service
 public class SignatureControllerService {
@@ -77,6 +82,30 @@ public class SignatureControllerService {
     public NamedResource fetchSignatureFile(String id) {
         var seSignature = seSignatureRepositoryService.fetchSignatureById(id);
         return new NamedResource(Base64.encode(seSignature.getSignature()), id);
+    }
+
+    @Transactional
+    public OnlyHeaderControllerResponse verifySignature(
+            SignatureVerificationControllerRequest request) throws CertificateException, NoSuchAlgorithmException,
+            NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
+        var file = fileExternalService.fetchFileWithoutContent(request.getFileId());
+
+        if (!file.getHashValue().equals(request.getFileHash())) {
+            throw new SeBaseException("The integrity of the file could not be verified", HttpStatus.OK);
+        }
+
+        var signature = seSignatureRepositoryService.fetchSignatureById(request.getSignatureId());
+        var certificate = CertificateUtil.loadCertificate(signature.getCert());
+
+        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING");
+        cipher.init(Cipher.DECRYPT_MODE, certificate.getPublicKey());
+        byte[] decryptedMessageHash = cipher.doFinal(signature.getSignature());
+
+        if (!Arrays.equals(request.getFileHash().getBytes(), decryptedMessageHash)) {
+            throw new SeBaseException("Verification failed. The file is not signed by the certificate", HttpStatus.OK);
+        }
+
+        return OnlyHeaderControllerResponse.success("Verification successful");
     }
 
 }

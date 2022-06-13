@@ -1,5 +1,7 @@
 package tr.edu.yildiz.ce.sesign.service.repository;
 
+import javax.transaction.Transactional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ public class SeSignatureRepositoryService {
         return seSignatureRepository.save(new SeSignature(signature, cert, fileId, tenantId));
     }
 
+    @Transactional
     public SeSignature fetchSignatureById(String id) {
         var sign = seSignatureRepository.findById(id)
                 .orElseThrow(() -> new SeBaseException("Signature record not found", HttpStatus.OK));
