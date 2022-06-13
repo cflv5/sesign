@@ -23,6 +23,12 @@ public class SeSignature {
     @Lob
     private byte[] signature;
 
+    @Column
+    private String fileId;
+
+    @Column
+    private String tenantId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private SeCertificate cert;
 
@@ -34,9 +40,11 @@ public class SeSignature {
         super();
     }
 
-    public SeSignature(byte[] signature, SeCertificate cert) {
+    public SeSignature(byte[] signature, SeCertificate cert, String fileId, String tenantId) {
         this.signature = signature;
         this.cert = cert;
+        this.fileId = fileId;
+        this.tenantId = tenantId;
     }
 
     public String getId() {
@@ -53,6 +61,22 @@ public class SeSignature {
 
     public void setSignature(byte[] signature) {
         this.signature = signature;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public void setTenantId(String tenantId) {
+        this.tenantId = tenantId;
     }
 
     public SeCertificate getCert() {

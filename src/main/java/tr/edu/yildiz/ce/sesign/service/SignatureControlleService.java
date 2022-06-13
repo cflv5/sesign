@@ -12,12 +12,15 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
+import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import tr.edu.yildiz.ce.se.base.context.TenantContext;
 import tr.edu.yildiz.ce.se.base.domain.ResponseHeader;
+import tr.edu.yildiz.ce.se.base.domain.io.NamedResource;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
 import tr.edu.yildiz.ce.sesign.domain.dto.SeSignatureDto;
 import tr.edu.yildiz.ce.sesign.domain.request.NewSignatureControllerRequest;
@@ -48,6 +51,8 @@ public class SignatureControlleService {
             var pk = seCertificateRepositoryService.findPrivateKey(cert, request.getCertificatePassword());
             var file = fileExternalService.fetchFileWithoutContent(request.getFileId());
 
+            var tenantId = TenantContext.getCurrentTenant().getTenantId();
+
             if (!file.getHashValue().equals(request.getFileHash())) {
                 throw new SeBaseException("Integrity of the file could not be verified", HttpStatus.OK);
             }
@@ -56,7 +61,8 @@ public class SignatureControlleService {
             cipher.init(Cipher.ENCRYPT_MODE, pk);
             byte[] digitalSignature = cipher.doFinal(file.getHashValue().getBytes());
 
-            var signature = seSignatureRepositoryService.saveSignature(cert, digitalSignature);
+            var signature = seSignatureRepositoryService
+                    .saveSignature(cert, digitalSignature, file.getFileId(), tenantId);
 
             return new NewSignatureControllerResponse(ResponseHeader.success(), SeSignatureDto.of(signature));
         } catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException | CertificateException
@@ -66,6 +72,11 @@ public class SignatureControlleService {
             LOGGER.error(errorMessage, e);
             throw new SeBaseException(errorMessage, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public NamedResource fetchSignatureFile(String id) {
+        var seSignature = seSignatureRepositoryService.fetchSignatureById(id);
+        return new NamedResource(Base64.encode(seSignature.getSignature()), id);
     }
 
 }
