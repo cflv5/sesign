@@ -14,14 +14,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import tr.edu.yildiz.ce.sesign.domain.request.NewSignatureControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.NewSignatureControllerResponse;
-import tr.edu.yildiz.ce.sesign.service.SignatureControlleService;
+import tr.edu.yildiz.ce.sesign.service.SignatureControllerService;
 
 @RestController
 @RequestMapping("/v1/api/signatures")
 public class SignatureController {
-    private final SignatureControlleService signatureControlleService;
+    private final SignatureControllerService signatureControlleService;
 
-    public SignatureController(SignatureControlleService signatureControlleService) {
+    public SignatureController(SignatureControllerService signatureControlleService) {
         this.signatureControlleService = signatureControlleService;
     }
 

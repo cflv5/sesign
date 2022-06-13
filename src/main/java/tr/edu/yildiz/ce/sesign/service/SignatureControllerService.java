@@ -30,14 +30,14 @@ import tr.edu.yildiz.ce.sesign.service.repository.SeCertificateRepositoryService
 import tr.edu.yildiz.ce.sesign.service.repository.SeSignatureRepositoryService;
 
 @Service
-public class SignatureControlleService {
+public class SignatureControllerService {
     private final SeSignatureRepositoryService seSignatureRepositoryService;
     private final SeCertificateRepositoryService seCertificateRepositoryService;
     private final FileExternalService fileExternalService;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SignatureControlleService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SignatureControllerService.class);
 
-    public SignatureControlleService(SeSignatureRepositoryService seSignatureRepositoryService,
+    public SignatureControllerService(SeSignatureRepositoryService seSignatureRepositoryService,
             SeCertificateRepositoryService seCertificateRepositoryService,
             FileExternalService fileExternalService) {
         this.seSignatureRepositoryService = seSignatureRepositoryService;
