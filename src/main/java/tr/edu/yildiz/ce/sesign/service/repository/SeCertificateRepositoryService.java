@@ -59,12 +59,13 @@ public class SeCertificateRepositoryService {
         private final SeCertificateRepository seCertificateRepository;
         private final KeyStore rootCA;
 
-        @Value("${se.key-store.password}")
-        private String keyStorePassword;
+        private final String keyStorePassword;
 
-        public SeCertificateRepositoryService(SeCertificateRepository seCertificateRepository)
+        public SeCertificateRepositoryService(SeCertificateRepository seCertificateRepository,
+                        @Value("${se.key-store.password}") String keyStorePassword)
                         throws NoSuchAlgorithmException, CertificateException, KeyStoreException, IOException {
                 this.seCertificateRepository = seCertificateRepository;
+                this.keyStorePassword = keyStorePassword;
                 this.rootCA = loadRootCA();
         }
 
@@ -72,7 +73,7 @@ public class SeCertificateRepositoryService {
                         throws IOException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
                 KeyStore ks = KeyStore.getInstance("PKCS12");
                 InputStream fis = new ClassPathResource("ytucese.p12").getInputStream();
-                ks.load(fis, "ytucese".toCharArray()); // There are other ways to read the password.
+                ks.load(fis, keyStorePassword.toCharArray());
                 fis.close();
                 return ks;
         }
@@ -166,5 +167,23 @@ public class SeCertificateRepositoryService {
         public SeCertificate findCertificateWithId(String id) {
                 return seCertificateRepository.findById(id)
                                 .orElseThrow(() -> new SeBaseException("Could not found certificate", HttpStatus.OK));
+        }
+
+        public PrivateKey findPrivateKey(SeCertificate seCert, String password)
+                        throws KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException,
+                        UnrecoverableKeyException {
+                var keyStore = CertificateUtil.loadKeyStore(Base64.decode(seCert.getKeyStore()), password);
+                return (PrivateKey) keyStore.getKey("1", password.toCharArray());
+        }
+
+        public SeCertificate findCertificateWithIdAsTenant(String certificateId) {
+                var cert = seCertificateRepository.findById(certificateId).orElseThrow(
+                                () -> new SeBaseException("Could not found the certificate", HttpStatus.OK));
+
+                if (!cert.getTenantId().equals(TenantContext.getCurrentTenant().getTenantId())) {
+                        throw new SeBaseException("Unauthorized", HttpStatus.UNAUTHORIZED);
+                }
+
+                return cert;
         }
 }
