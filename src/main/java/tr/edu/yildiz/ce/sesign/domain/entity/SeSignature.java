@@ -6,20 +6,22 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.GenericGenerator;
 
 @Entity
 public class SeSignature {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int id;
+    @GeneratedValue(generator = "uuid2")
+    @GenericGenerator(name = "uuid2", strategy = "org.hibernate.id.UUIDGenerator")
+    private String id;
 
-    @Column
-    private String signature;
+    @Lob
+    private byte[] signature;
 
     @ManyToOne(fetch = FetchType.LAZY)
     private SeCertificate cert;
@@ -28,19 +30,28 @@ public class SeSignature {
     @CreationTimestamp
     private OffsetDateTime createdAt;
 
-    public int getId() {
+    public SeSignature() {
+        super();
+    }
+
+    public SeSignature(byte[] signature, SeCertificate cert) {
+        this.signature = signature;
+        this.cert = cert;
+    }
+
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
-    public String getSignature() {
+    public byte[] getSignature() {
         return signature;
     }
 
-    public void setSignature(String signature) {
+    public void setSignature(byte[] signature) {
         this.signature = signature;
     }
 
