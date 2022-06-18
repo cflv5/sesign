@@ -19,10 +19,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import tr.edu.yildiz.ce.se.base.context.TenantContext;
+import tr.edu.yildiz.ce.se.base.domain.OnlyHeaderControllerResponse;
 import tr.edu.yildiz.ce.se.base.domain.ResponseHeader;
 import tr.edu.yildiz.ce.se.base.domain.io.NamedResource;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
 import tr.edu.yildiz.ce.sesign.domain.dto.SeCertificateDto;
+import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificateStatus;
 import tr.edu.yildiz.ce.sesign.domain.request.CertificateInsertionControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.CertificateInsertionControllerResponse;
 import tr.edu.yildiz.ce.sesign.domain.response.FetchSeCertificateDetailControllerResponse;
@@ -78,6 +80,15 @@ public class CertificateControllerService {
     public FetchSeCertificateDetailControllerResponse fetchCertificateDetail(String id) {
         var seCert = seCertificateRepositoryService.findCertificateWithId(id);
         return new FetchSeCertificateDetailControllerResponse(ResponseHeader.success(), SeCertificateDto.of(seCert));
+    }
+
+    public OnlyHeaderControllerResponse passiviseCertificate(String id) {
+        var certificate = seCertificateRepositoryService.findCertificateWithIdAsTenant(id);
+        if(certificate.getStatus() == SeCertificateStatus.ACTIVE) {
+            certificate.setStatus(SeCertificateStatus.PASSIVE);
+            return OnlyHeaderControllerResponse.success();
+        }
+        return OnlyHeaderControllerResponse.success("Certificate is already passive.");
     }
 
 }

@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import tr.edu.yildiz.ce.se.base.domain.OnlyHeaderControllerResponse;
 import tr.edu.yildiz.ce.sesign.domain.request.CertificateInsertionControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.CertificateInsertionControllerResponse;
 import tr.edu.yildiz.ce.sesign.domain.response.FetchSeCertificateDetailControllerResponse;
@@ -29,6 +30,12 @@ public class CertificateController {
     public ResponseEntity<CertificateInsertionControllerResponse> generateCertificate(
             @RequestBody CertificateInsertionControllerRequest request) {
         return ResponseEntity.ok().body(certificateControllerService.createSignedCertificate(request));
+    }
+
+    @PostMapping(value = "/delete/{id}")
+    public ResponseEntity<OnlyHeaderControllerResponse> deleteCertificate(
+            @PathVariable String id) {
+        return ResponseEntity.ok().body(certificateControllerService.passiviseCertificate(id));
     }
 
     @GetMapping(value = "/mine")
