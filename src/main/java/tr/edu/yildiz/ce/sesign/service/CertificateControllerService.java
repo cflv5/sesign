@@ -82,6 +82,7 @@ public class CertificateControllerService {
         return new FetchSeCertificateDetailControllerResponse(ResponseHeader.success(), SeCertificateDto.of(seCert));
     }
 
+    @Transactional
     public OnlyHeaderControllerResponse passiviseCertificate(String id) {
         var certificate = seCertificateRepositoryService.findCertificateWithIdAsTenant(id);
         if(certificate.getStatus() == SeCertificateStatus.ACTIVE) {
