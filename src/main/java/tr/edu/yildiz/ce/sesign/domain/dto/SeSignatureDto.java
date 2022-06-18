@@ -11,6 +11,7 @@ import tr.edu.yildiz.ce.sesign.domain.entity.SeSignature;
 public class SeSignatureDto implements Serializable {
     private String id;
     private String certificateId;
+    private String fileId;
     private String signature;
     private OffsetDateTime createdAt;
 
@@ -19,6 +20,7 @@ public class SeSignatureDto implements Serializable {
         dto.id = signature.getId();
         dto.certificateId = signature.getCert().getId();
         dto.createdAt = signature.getCreatedAt();
+        dto.fileId = signature.getFileId();
         dto.signature = new String(Base64.encode(signature.getSignature()), StandardCharsets.UTF_8);
         return dto;
     }
@@ -41,6 +43,14 @@ public class SeSignatureDto implements Serializable {
 
     public String getSignature() {
         return signature;
+    }
+
+    public String getFileId() {
+        return fileId;
+    }
+
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
     public void setSignature(String signature) {
