@@ -24,6 +24,7 @@ import tr.edu.yildiz.ce.se.base.domain.OnlyHeaderControllerResponse;
 import tr.edu.yildiz.ce.sesign.domain.request.NewSignatureControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.request.SignatureVerificationControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.NewSignatureControllerResponse;
+import tr.edu.yildiz.ce.sesign.domain.response.TenantsSignaturesControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.SignatureControllerService;
 
 @RestController
@@ -57,6 +58,11 @@ public class SignatureController {
             throws InvalidKeyException, CertificateException, NoSuchAlgorithmException, NoSuchPaddingException,
             IllegalBlockSizeException, BadPaddingException, IOException {
         return ResponseEntity.ok().body(signatureControlleService.verifySignature(request));
+    }
+    
+    @GetMapping(value = "/mine")
+    public ResponseEntity<TenantsSignaturesControllerResponse> fetchTenantsSignatures(){
+        return ResponseEntity.ok().body(signatureControlleService.fetchTenantsSignatures());
     }
 
 }

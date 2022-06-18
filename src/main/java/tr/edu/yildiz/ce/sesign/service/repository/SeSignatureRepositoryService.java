@@ -1,10 +1,13 @@
 package tr.edu.yildiz.ce.sesign.service.repository;
 
+import java.util.List;
+
 import javax.transaction.Transactional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import tr.edu.yildiz.ce.se.base.context.TenantContext;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
 import tr.edu.yildiz.ce.sesign.domain.entity.SeCertificate;
 import tr.edu.yildiz.ce.sesign.domain.entity.SeSignature;
@@ -32,5 +35,10 @@ public class SeSignatureRepositoryService {
                 .orElseThrow(() -> new SeBaseException("Signature record not found", HttpStatus.OK));
         fileExternalService.fetchFileWithoutContent(sign.getFileId());
         return sign;
+    }
+
+    public List<SeSignature> findTenantsSignatures() {
+        var tenantId = TenantContext.getCurrentTenant().getTenantId();
+        return seSignatureRepository.findAllByTenantId(tenantId);
     }
 }

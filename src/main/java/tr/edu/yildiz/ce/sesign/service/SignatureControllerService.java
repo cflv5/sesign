@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -29,6 +30,7 @@ import tr.edu.yildiz.ce.sesign.domain.dto.SeSignatureDto;
 import tr.edu.yildiz.ce.sesign.domain.request.NewSignatureControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.request.SignatureVerificationControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.NewSignatureControllerResponse;
+import tr.edu.yildiz.ce.sesign.domain.response.TenantsSignaturesControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.external.FileExternalService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeCertificateRepositoryService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeSignatureRepositoryService;
@@ -106,6 +108,13 @@ public class SignatureControllerService {
         }
 
         return OnlyHeaderControllerResponse.success("Verification successful");
+    }
+
+    @Transactional
+    public TenantsSignaturesControllerResponse fetchTenantsSignatures() {
+        return new TenantsSignaturesControllerResponse(ResponseHeader.success(),
+                seSignatureRepositoryService.findTenantsSignatures().stream().map(SeSignatureDto::of)
+                        .collect(Collectors.toList()));
     }
 
 }
