@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import tr.edu.yildiz.ce.sesign.domain.request.CertificateInsertionControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.CertificateInsertionControllerResponse;
+import tr.edu.yildiz.ce.sesign.domain.response.FetchSeCertificateDetailControllerResponse;
 import tr.edu.yildiz.ce.sesign.domain.response.FindTenantsCertificateControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.CertificateControllerService;
 
@@ -44,5 +45,12 @@ public class CertificateController {
                 .contentType(new MediaType("application", "x-x509-user-cert"))
                 .header("Content-Disposition", "attachment; filename=" + resource.getFilename())
                 .body(resource);
+    }
+    
+    @GetMapping(value = "/detail/{id}")
+    public ResponseEntity<FetchSeCertificateDetailControllerResponse> fetchCertificateDetail(@PathVariable("id") String id) {
+        return ResponseEntity
+                .ok()
+                .body(certificateControllerService.fetchCertificateDetail(id));
     }
 }

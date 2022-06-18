@@ -161,7 +161,7 @@ public class SeCertificateRepositoryService {
         public List<SeCertificateDto> findTenantsCertificates() {
                 var tenantId = TenantContext.getCurrentTenant().getTenantId();
                 return seCertificateRepository.findByTenantId(tenantId).stream()
-                                .map(c -> new SeCertificateDto(c.getName(), c.getId())).collect(Collectors.toList());
+                                .map(c -> SeCertificateDto.of(c)).collect(Collectors.toList());
         }
 
         public SeCertificate findCertificateWithId(String id) {

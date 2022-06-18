@@ -22,8 +22,10 @@ import tr.edu.yildiz.ce.se.base.context.TenantContext;
 import tr.edu.yildiz.ce.se.base.domain.ResponseHeader;
 import tr.edu.yildiz.ce.se.base.domain.io.NamedResource;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
+import tr.edu.yildiz.ce.sesign.domain.dto.SeCertificateDto;
 import tr.edu.yildiz.ce.sesign.domain.request.CertificateInsertionControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.CertificateInsertionControllerResponse;
+import tr.edu.yildiz.ce.sesign.domain.response.FetchSeCertificateDetailControllerResponse;
 import tr.edu.yildiz.ce.sesign.domain.response.FindTenantsCertificateControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.external.UserExternalService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeCertificateRepositoryService;
@@ -71,6 +73,11 @@ public class CertificateControllerService {
     public NamedResource fetchCertificate(String id) {
         var seCert = seCertificateRepositoryService.findCertificateWithId(id);
         return new NamedResource(Base64.decode(seCert.getCert()), seCert.getName() + ".crt");
+    }
+
+    public FetchSeCertificateDetailControllerResponse fetchCertificateDetail(String id) {
+        var seCert = seCertificateRepositoryService.findCertificateWithId(id);
+        return new FetchSeCertificateDetailControllerResponse(ResponseHeader.success(), SeCertificateDto.of(seCert));
     }
 
 }
