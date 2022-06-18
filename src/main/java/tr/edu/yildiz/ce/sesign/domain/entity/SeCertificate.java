@@ -6,6 +6,8 @@ import java.time.OffsetDateTime;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -35,7 +37,7 @@ public class SeCertificate implements Serializable {
     @Column
     private String name;
 
-    @Column
+    @Enumerated(EnumType.STRING)
     private SeCertificateStatus status;
 
     @Column(nullable = false, updatable = false)
