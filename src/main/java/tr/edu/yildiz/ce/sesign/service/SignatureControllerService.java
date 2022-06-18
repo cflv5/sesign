@@ -30,6 +30,7 @@ import tr.edu.yildiz.ce.sesign.domain.dto.SeSignatureDto;
 import tr.edu.yildiz.ce.sesign.domain.request.NewSignatureControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.request.SignatureVerificationControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.response.NewSignatureControllerResponse;
+import tr.edu.yildiz.ce.sesign.domain.response.SignatureDetailControllerResponse;
 import tr.edu.yildiz.ce.sesign.domain.response.TenantsSignaturesControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.external.FileExternalService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeCertificateRepositoryService;
@@ -115,6 +116,12 @@ public class SignatureControllerService {
         return new TenantsSignaturesControllerResponse(ResponseHeader.success(),
                 seSignatureRepositoryService.findTenantsSignatures().stream().map(SeSignatureDto::of)
                         .collect(Collectors.toList()));
+    }
+
+    public SignatureDetailControllerResponse fetchSignatureDetail(String id) {
+        var seSignature = seSignatureRepositoryService.fetchSignatureById(id);
+        fileExternalService.fetchFileWithoutContent(seSignature.getFileId());
+        return new SignatureDetailControllerResponse(ResponseHeader.success(), SeSignatureDto.of(seSignature));
     }
 
 }
