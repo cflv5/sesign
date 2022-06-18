@@ -161,7 +161,7 @@ public class SeCertificateRepositoryService {
         public List<SeCertificateDto> findTenantsCertificates() {
                 var tenantId = TenantContext.getCurrentTenant().getTenantId();
                 return seCertificateRepository.findByTenantId(tenantId).stream()
-                                .map(c -> SeCertificateDto.of(c)).collect(Collectors.toList());
+                                .map(SeCertificateDto::of).collect(Collectors.toList());
         }
 
         public SeCertificate findCertificateWithId(String id) {
@@ -177,7 +177,7 @@ public class SeCertificateRepositoryService {
         }
 
         public SeCertificate findCertificateWithIdAsTenant(String certificateId) {
-                var cert = seCertificateRepository.findById(certificateId).orElseThrow(
+                var cert = seCertificateRepository.findActiveById(certificateId).orElseThrow(
                                 () -> new SeBaseException("Could not found the certificate", HttpStatus.OK));
 
                 if (!cert.getTenantId().equals(TenantContext.getCurrentTenant().getTenantId())) {
