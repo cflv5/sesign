@@ -53,6 +53,7 @@ public class SignatureControllerService {
         this.fileExternalService = fileExternalService;
     }
 
+    @Transactional
     public NewSignatureControllerResponse signFile(NewSignatureControllerRequest request) {
         try {
             var cert = seCertificateRepositoryService.findCertificateWithIdAsTenant(request.getCertificateId());
