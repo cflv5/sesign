@@ -12,7 +12,6 @@ import java.security.cert.CertificateException;
 import javax.transaction.Transactional;
 
 import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.util.encoders.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -74,7 +73,7 @@ public class CertificateControllerService {
     @Transactional
     public NamedResource fetchCertificate(String id) {
         var seCert = seCertificateRepositoryService.findCertificateWithId(id);
-        return new NamedResource(Base64.decode(seCert.getCert()), seCert.getName() + ".crt");
+        return new NamedResource(seCert.getCert(), seCert.getName() + ".crt");
     }
 
     public FetchSeCertificateDetailControllerResponse fetchCertificateDetail(String id) {
