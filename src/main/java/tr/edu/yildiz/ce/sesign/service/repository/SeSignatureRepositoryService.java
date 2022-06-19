@@ -32,7 +32,7 @@ public class SeSignatureRepositoryService {
     @Transactional
     public SeSignature fetchSignatureById(String id) {
         var sign = seSignatureRepository.findById(id)
-                .orElseThrow(() -> new SeBaseException("Signature record not found", HttpStatus.OK));
+                .orElseThrow(() -> new SeBaseException("Signature record not found", HttpStatus.NOT_FOUND));
         fileExternalService.fetchFileWithoutContent(sign.getFileId());
         return sign;
     }
