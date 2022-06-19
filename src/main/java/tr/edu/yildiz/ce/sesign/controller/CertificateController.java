@@ -50,7 +50,7 @@ public class CertificateController {
                 .ok()
                 .contentLength(resource.contentLength())
                 .contentType(new MediaType("application", "x-x509-user-cert"))
-                .header("Content-Disposition", "attachment; filename=" + resource.getResourceName())
+                .header("Content-Disposition", "attachment; filename=" + resource.getFilename())
                 .body(resource);
     }
     
