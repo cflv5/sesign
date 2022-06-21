@@ -26,6 +26,7 @@ import tr.edu.yildiz.ce.se.base.domain.OnlyHeaderControllerResponse;
 import tr.edu.yildiz.ce.se.base.domain.ResponseHeader;
 import tr.edu.yildiz.ce.se.base.domain.io.NamedResource;
 import tr.edu.yildiz.ce.se.base.exception.SeBaseException;
+import tr.edu.yildiz.ce.sesign.domain.constants.CertificateConstants;
 import tr.edu.yildiz.ce.sesign.domain.dto.SeSignatureDto;
 import tr.edu.yildiz.ce.sesign.domain.request.NewSignatureControllerRequest;
 import tr.edu.yildiz.ce.sesign.domain.request.SignatureVerificationControllerRequest;
@@ -66,7 +67,7 @@ public class SignatureControllerService {
                 throw new SeBaseException("Integrity of the file could not be verified", HttpStatus.OK);
             }
 
-            Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING");
+            Cipher cipher = Cipher.getInstance(CertificateConstants.CIPHER_SIGNATURE_ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, pk);
             byte[] digitalSignature = cipher.doFinal(file.getHashValue().getBytes());
 
@@ -101,7 +102,7 @@ public class SignatureControllerService {
         var signature = seSignatureRepositoryService.fetchSignatureById(request.getSignatureId());
         var certificate = CertificateUtil.loadCertificate(signature.getCert());
 
-        Cipher cipher = Cipher.getInstance("RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING");
+        Cipher cipher = Cipher.getInstance(CertificateConstants.CIPHER_SIGNATURE_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, certificate.getPublicKey());
         byte[] decryptedMessageHash = cipher.doFinal(signature.getSignature());
 
