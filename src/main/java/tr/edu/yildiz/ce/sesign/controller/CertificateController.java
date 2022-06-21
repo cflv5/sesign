@@ -1,5 +1,8 @@
 package tr.edu.yildiz.ce.sesign.controller;
 
+import java.security.KeyStoreException;
+import java.security.cert.CertificateEncodingException;
+
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -53,11 +56,26 @@ public class CertificateController {
                 .header("Content-Disposition", "attachment; filename=" + resource.getFilename())
                 .body(resource);
     }
-    
+
     @GetMapping(value = "/detail/{id}")
-    public ResponseEntity<FetchSeCertificateDetailControllerResponse> fetchCertificateDetail(@PathVariable("id") String id) {
+    public ResponseEntity<FetchSeCertificateDetailControllerResponse> fetchCertificateDetail(
+            @PathVariable("id") String id) {
         return ResponseEntity
                 .ok()
                 .body(certificateControllerService.fetchCertificateDetail(id));
+    }
+
+    @GetMapping(value = "/validate/{id}")
+    public ResponseEntity<OnlyHeaderControllerResponse> validateCertificate(@PathVariable("id") String id) {
+        return ResponseEntity
+                .ok()
+                .body(certificateControllerService.validateCertificate(id));
+    }
+
+    @GetMapping(value = "/ytucese")
+    public ResponseEntity<Resource> fetchRootCertificate() throws CertificateEncodingException, KeyStoreException {
+        return ResponseEntity
+                .ok()
+                .body(certificateControllerService.fetchRootCertificate());
     }
 }

@@ -7,6 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SignatureException;
 import java.security.UnrecoverableKeyException;
+import java.security.cert.CertificateEncodingException;
 import java.security.cert.CertificateException;
 
 import javax.transaction.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import tr.edu.yildiz.ce.se.base.context.TenantContext;
+import tr.edu.yildiz.ce.se.base.domain.HeaderMessage;
 import tr.edu.yildiz.ce.se.base.domain.OnlyHeaderControllerResponse;
 import tr.edu.yildiz.ce.se.base.domain.ResponseHeader;
 import tr.edu.yildiz.ce.se.base.domain.io.NamedResource;
@@ -84,11 +86,31 @@ public class CertificateControllerService {
     @Transactional
     public OnlyHeaderControllerResponse passiviseCertificate(String id) {
         var certificate = seCertificateRepositoryService.findCertificateWithIdAsTenant(id);
-        if(certificate.getStatus() == SeCertificateStatus.ACTIVE) {
+        if (certificate.getStatus() == SeCertificateStatus.ACTIVE) {
             certificate.setStatus(SeCertificateStatus.PASSIVE);
             return OnlyHeaderControllerResponse.success();
         }
         return OnlyHeaderControllerResponse.success("Certificate is already passive.");
+    }
+
+    public OnlyHeaderControllerResponse validateCertificate(String id) {
+        var certificate = seCertificateRepositoryService.findCertificateWithId(id);
+
+        try {
+            seCertificateRepositoryService.validateCertificate(certificate);
+        } catch (Exception e) {
+            LOGGER.error("Error occured while validating the certificate", e);
+            return OnlyHeaderControllerResponse
+                    .failed(HeaderMessage.Builder.create().code(401)
+                            .text("Verification failed. Certificate is not signed by YTUCESE root certificate")
+                            .build());
+        }
+
+        return OnlyHeaderControllerResponse.success();
+    }
+
+    public NamedResource fetchRootCertificate() throws CertificateEncodingException, KeyStoreException {
+        return new NamedResource(seCertificateRepositoryService.fetchRootCertificate().getEncoded(), "YTUCESE.crt");
     }
 
 }

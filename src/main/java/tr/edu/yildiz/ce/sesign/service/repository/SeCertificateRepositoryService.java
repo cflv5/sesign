@@ -166,7 +166,8 @@ public class SeCertificateRepositoryService {
 
         public SeCertificate findCertificateWithId(String id) {
                 return seCertificateRepository.findById(id)
-                                .orElseThrow(() -> new SeBaseException("Could not found certificate", HttpStatus.OK));
+                                .orElseThrow(() -> new SeBaseException("Could not found certificate",
+                                                HttpStatus.NOT_FOUND));
         }
 
         public PrivateKey findPrivateKey(SeCertificate seCert, String password)
@@ -178,12 +179,22 @@ public class SeCertificateRepositoryService {
 
         public SeCertificate findCertificateWithIdAsTenant(String certificateId) {
                 var cert = seCertificateRepository.findActiveById(certificateId).orElseThrow(
-                                () -> new SeBaseException("Could not found the certificate", HttpStatus.OK));
+                                () -> new SeBaseException("Could not found the certificate", HttpStatus.NOT_FOUND));
 
                 if (!cert.getTenantId().equals(TenantContext.getCurrentTenant().getTenantId())) {
                         throw new SeBaseException("Unauthorized", HttpStatus.UNAUTHORIZED);
                 }
 
                 return cert;
+        }
+
+        public boolean validateCertificate(SeCertificate certificate) throws InvalidKeyException, CertificateException,
+                        NoSuchAlgorithmException, NoSuchProviderException, SignatureException, KeyStoreException {
+                CertificateUtil.loadCertificate(certificate).verify(rootCA.getCertificate("1").getPublicKey());
+                return true;
+        }
+
+        public X509Certificate fetchRootCertificate() throws KeyStoreException {
+                return (X509Certificate) rootCA.getCertificate("1");
         }
 }
