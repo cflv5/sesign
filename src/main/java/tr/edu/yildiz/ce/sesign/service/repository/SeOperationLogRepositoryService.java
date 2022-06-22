@@ -21,7 +21,7 @@ public class SeOperationLogRepositoryService {
     }
 
     public List<SeOperationLog> getTenantsLog() {
-        return logRepository.findByTenantId(TenantContext.getCurrentTenant().getRequestId());
+        return logRepository.findByTenantIdOrderByIdDesc(TenantContext.getCurrentTenant().getRequestId());
     }
 
 }

@@ -9,5 +9,5 @@ import tr.edu.yildiz.ce.sesign.domain.entity.SeOperationLog;
 
 @Repository
 public interface SeOperationLogRepository extends JpaRepository<SeOperationLog, Integer> {
-    List<SeOperationLog> findByTenantId(String id);
+    List<SeOperationLog> findByTenantIdOrderByIdDesc(String id);
 }
