@@ -23,7 +23,7 @@ public class SeOperationLog implements Serializable {
     private String requestId;
 
     @Column
-    private String messaage;
+    private String message;
 
     public SeOperationLog() {
         super();
@@ -31,7 +31,7 @@ public class SeOperationLog implements Serializable {
 
     public static SeOperationLog generate(String message) {
         var log = new SeOperationLog();
-        log.setMessaage(message);
+        log.setMessage(message);
         log.setTenantId(TenantContext.getCurrentTenant().getTenantId());
         log.setRequestId(TenantContext.getCurrentTenant().getRequestId());
         return log;
@@ -61,12 +61,12 @@ public class SeOperationLog implements Serializable {
         this.requestId = requestId;
     }
 
-    public String getMessaage() {
-        return messaage;
+    public String getMessage() {
+        return message;
     }
 
-    public void setMessaage(String messaage) {
-        this.messaage = messaage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
 }
