@@ -1,6 +1,7 @@
 package tr.edu.yildiz.ce.sesign.service;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -35,6 +36,7 @@ import tr.edu.yildiz.ce.sesign.domain.response.SignatureDetailControllerResponse
 import tr.edu.yildiz.ce.sesign.domain.response.TenantsSignaturesControllerResponse;
 import tr.edu.yildiz.ce.sesign.service.external.FileExternalService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeCertificateRepositoryService;
+import tr.edu.yildiz.ce.sesign.service.repository.SeOperationLogRepositoryService;
 import tr.edu.yildiz.ce.sesign.service.repository.SeSignatureRepositoryService;
 import tr.edu.yildiz.ce.sesign.util.CertificateUtil;
 
@@ -43,23 +45,28 @@ public class SignatureControllerService {
     private final SeSignatureRepositoryService seSignatureRepositoryService;
     private final SeCertificateRepositoryService seCertificateRepositoryService;
     private final FileExternalService fileExternalService;
+    private final SeOperationLogRepositoryService logRepositoryService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SignatureControllerService.class);
 
     public SignatureControllerService(SeSignatureRepositoryService seSignatureRepositoryService,
             SeCertificateRepositoryService seCertificateRepositoryService,
-            FileExternalService fileExternalService) {
+            FileExternalService fileExternalService,
+            SeOperationLogRepositoryService logRepositoryService) {
         this.seSignatureRepositoryService = seSignatureRepositoryService;
         this.seCertificateRepositoryService = seCertificateRepositoryService;
         this.fileExternalService = fileExternalService;
+        this.logRepositoryService = logRepositoryService;
     }
 
     @Transactional
     public NewSignatureControllerResponse signFile(NewSignatureControllerRequest request) {
         try {
             var cert = seCertificateRepositoryService.findCertificateWithIdAsTenant(request.getCertificateId());
+            logRepositoryService.save(String.format("Certificate found: %s", cert.getName()));
             var pk = seCertificateRepositoryService.findPrivateKey(cert, request.getCertificatePassword());
             var file = fileExternalService.fetchFileWithoutContent(request.getFileId());
+            logRepositoryService.save(String.format("File found: %s", file.getName()));
 
             var tenantId = TenantContext.getCurrentTenant().getTenantId();
 
@@ -71,8 +78,14 @@ public class SignatureControllerService {
             cipher.init(Cipher.ENCRYPT_MODE, pk);
             byte[] digitalSignature = cipher.doFinal(file.getHashValue().getBytes());
 
+            logRepositoryService.save(String.format("Cipher created with '%s' algorith",
+                    CertificateConstants.CIPHER_SIGNATURE_ALGORITHM));
+
             var signature = seSignatureRepositoryService
                     .saveSignature(cert, digitalSignature, file.getFileId(), tenantId);
+
+            logRepositoryService.save(String.format("Signature created: %s",
+                    new String(digitalSignature, StandardCharsets.UTF_8).substring(0, 10)));
 
             return new NewSignatureControllerResponse(ResponseHeader.success(), SeSignatureDto.of(signature));
         } catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException | CertificateException
@@ -94,18 +107,32 @@ public class SignatureControllerService {
             SignatureVerificationControllerRequest request) throws CertificateException, NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException, IOException {
         var file = fileExternalService.fetchFileWithoutContent(request.getFileId());
+        logRepositoryService.save(String.format("File (%s) found: %s", file.getName(),
+                file.getHashValue().substring(0, 10)));
 
         if (!file.getHashValue().equals(request.getFileHash())) {
+            logRepositoryService
+                    .save(String.format("Stated file hash is not same with calculated one: %s",
+                            request.getFileHash().substring(0, 10)));
             throw new SeBaseException("The integrity of the file could not be verified", HttpStatus.OK);
         }
+        logRepositoryService
+                .save(String.format("Stated file hash is same with calculated one: %s",
+                        request.getFileHash().substring(0, 10)));
 
         var signature = seSignatureRepositoryService.fetchSignatureById(request.getSignatureId());
         var certificate = CertificateUtil.loadCertificate(signature.getCert());
+
+        logRepositoryService.save(String.format("Signature fetched: %s",
+                new String(signature.getSignature(), StandardCharsets.UTF_8).substring(0, 10)));
+        logRepositoryService.save(String.format("Using certificate: %s", signature.getCert().getName()));
 
         Cipher cipher = Cipher.getInstance(CertificateConstants.CIPHER_SIGNATURE_ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, certificate.getPublicKey());
         byte[] decryptedMessageHash = cipher.doFinal(signature.getSignature());
 
+        logRepositoryService.save(String.format("Decrypted message: %s",
+                new String(decryptedMessageHash, StandardCharsets.UTF_8).substring(0, 10)));
         if (!Arrays.equals(request.getFileHash().getBytes(), decryptedMessageHash)) {
             throw new SeBaseException("Verification failed. The file is not signed by the certificate", HttpStatus.OK);
         }
