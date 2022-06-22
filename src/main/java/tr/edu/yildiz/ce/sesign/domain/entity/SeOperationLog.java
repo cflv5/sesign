@@ -1,12 +1,15 @@
 package tr.edu.yildiz.ce.sesign.domain.entity;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+
+import org.hibernate.annotations.CreationTimestamp;
 
 import tr.edu.yildiz.ce.se.base.context.TenantContext;
 
@@ -24,6 +27,10 @@ public class SeOperationLog implements Serializable {
 
     @Column
     private String message;
+
+    @Column(nullable = false, updatable = false)
+    @CreationTimestamp
+    private OffsetDateTime createdAt;
 
     public SeOperationLog() {
         super();
@@ -67,6 +74,14 @@ public class SeOperationLog implements Serializable {
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
 }
