@@ -14,7 +14,7 @@ import tr.edu.yildiz.ce.sesign.domain.external.response.FindTenantExternalRespon
 public class UserExternalService {
     private final SeRestService seRestService;
 
-    @Value("${se.endpoints.user-service-internal}")
+    @Value("${se.endpoints.user-service}")
     private String userServiceUrl;
 
     public UserExternalService(SeRestService seRestService) {
